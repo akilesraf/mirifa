@@ -1,53 +1,71 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mirifanet/FirebaseCustom.dart';
-import 'package:mirifanet/pages/login_page.dart';
 
-import 'package:mirifanet/pages/utils.dart';
-import 'package:mirifanet/pages/verify_email_page.dart';
-
-import 'Home.dart';
-import 'PaginasDeRifas/scrRifaCinco.dart';
-import 'PaginasDeRifas/scrRifaDos.dart';
-import 'PaginasDeRifas/scrRifaSeis.dart';
-import 'PaginasDeRifas/scrRifaTres.dart';
-import 'PaginasDeRifas/scrRifaUno.dart';
-import 'PaginasDeRifas/scrRifacuatro.dart';
-import 'PaginasMenuInferior/QuienesSomos.dart';
-import 'PaginasMenuInferior/TerminosYCondiciones.dart';
-import 'PaginasMenuInferior/quiero_rifar.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'flutter_flow/flutter_flow_theme.dart';
+import 'flutter_flow/flutter_flow_util.dart';
+import 'flutter_flow/internationalization.dart';
+import 'flutter_flow/nav/nav.dart';
+import 'index.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
 
-  await FirebaseHelper.initDatabase();
+  await FlutterFlowTheme.initialize();
 
+  runApp(MyApp());
+}
 
+class MyApp extends StatefulWidget {
+  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
 
-final navigatorKey = GlobalKey<NavigatorState>();
+  static _MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>()!;
+}
 
-    runApp(MaterialApp(
-        scaffoldMessengerKey: messengerkey,
-        title: 'Mi Rifa',
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        initialRoute: '/Home',
-        routes: <String, WidgetBuilder>{
-          '/pages/login_page': (context) => LoginPage(),
-          '/Home': (context) => MyHome(),
-          '/PaginasDeRifas/scrRifaCinco.dart': (context) => scrRifaCinco(),
-          '/PaginasDeRifas/scrRifaDos.dart': (context) => scrRifaDos(),
-          '/PaginasDeRifas/scrRifaSeis.dart': (context) => scrRifaSeis(),
-          '/PaginasDeRifas/scrRifaTres.dart': (context) => scrRifaTres(),
-          '/PaginasDeRifas/scrRifaUno.dart': (context) => scrRifaUno(),
-          '/PaginasDeRifas/scrRifacuatro.dart': (context) => scrRifaCuatro(),
-          '/PaginasMenuInferior/QuienesSomos': (context) => QuienesSomos(),
-          '/PaginasMenuInferior/TerminosYCondiciones': (context) => TerminosYCondiciones(),
-          '/PaginasMenuInferior/Quiero_rifar': (context) => QuieroRifar(),
-        },
-        theme: ThemeData(
-          primarySwatch: Colors.red,
-        ),
-        home: MyHome()
-        //
-        ));
+class _MyAppState extends State<MyApp> {
+  Locale? _locale;
+  ThemeMode _themeMode = FlutterFlowTheme.themeMode;
+
+  late AppStateNotifier _appStateNotifier;
+  late GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _appStateNotifier = AppStateNotifier.instance;
+    _router = createRouter(_appStateNotifier);
   }
 
+  void setLocale(String language) {
+    setState(() => _locale = createLocale(language));
+  }
+
+  void setThemeMode(ThemeMode mode) => setState(() {
+        _themeMode = mode;
+        FlutterFlowTheme.saveThemeMode(mode);
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Mi Rifa',
+      localizationsDelegates: [
+        FFLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale: _locale,
+      supportedLocales: const [Locale('en', '')],
+      theme: ThemeData(brightness: Brightness.light),
+      darkTheme: ThemeData(brightness: Brightness.dark),
+      themeMode: _themeMode,
+      routerConfig: _router,
+    );
+  }
+}
